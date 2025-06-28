@@ -42,9 +42,13 @@ public class GamePanel extends JPanel{
 
     void renderTiles(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
+        int count = 1;
         for (tile tile : tiles) {
+            g2d.setColor(Color.black);
+            g2d.drawString(""+count, tile.xcoord, tile.ycoord);
             g2d.setColor(Color.GREEN);
             g2d.fill(tile.getRect());
+            count++;
         }
     }
 
