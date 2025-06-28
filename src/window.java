@@ -4,10 +4,7 @@ import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -15,30 +12,34 @@ import javax.swing.Timer;
 
 public class window extends JFrame {
 
-    Set<Integer> keysPressed = new HashSet<>();
-    public int tilescount = 21;
+    public Set<Integer> keysPressed = new HashSet<>();
+    public int tilescount = 64;
 
     public window() {
         setTitle("Game Window");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setGameArea(21);
+        setGameArea(tilescount);
         setSize(800, 600);
         setLocationRelativeTo(null);
         setVisible(true);
     }
     void setGameArea(int tilescount) {
 
-        GamePanel gamePanel = new GamePanel(tilescount);
+        GamePanel gamePanel = new GamePanel(tilescount,this);
+
         JScrollPane scrollPane = new JScrollPane(gamePanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+
+
+        gamePanel.runGameLoop(scrollPane);
+
 
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
                 keysPressed.add(e.getKeyCode());
-                System.out.println("key preseed");
             }
             @Override
             public void keyReleased(KeyEvent e) {
@@ -51,26 +52,12 @@ public class window extends JFrame {
         JScrollBar vBar = scrollPane.getVerticalScrollBar();
         JScrollBar hBar = scrollPane.getHorizontalScrollBar();
 
-       Timer timer = new Timer(10,e->{
-            if(keysPressed.contains(KeyEvent.VK_W)){
-                vBar.setValue(vBar.getValue() - 5);
-            }
-            if(keysPressed.contains(KeyEvent.VK_S)){
-                vBar.setValue(vBar.getValue() + 5);
-            }
-            if(keysPressed.contains(KeyEvent.VK_A)){
-                hBar.setValue(hBar.getValue() - 5
-                );
-            }
-            if(keysPressed.contains(KeyEvent.VK_D)){
-                hBar.setValue(hBar.getValue() + 5);
-            }
 
-       });
-        timer.start();
+       
        
 
         add(scrollPane, BorderLayout.CENTER);
+       
 
 
     }
