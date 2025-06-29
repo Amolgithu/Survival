@@ -27,7 +27,11 @@ public class GamePanel extends JPanel{
     private window w;
     private Rectangle boundrec;
 
+    JViewport viewport;
+    JScrollPane scrollPane;
+
     JScrollBar vBar, hBar;
+    boolean canScrollDown,canScrollLeft,canScrollRight,canScrollUp;
 
     public GamePanel(int tilescount,window w) {  
         setPreferredSize(new Dimension(64*tilescount, 64*tilescount ));
@@ -50,15 +54,10 @@ public class GamePanel extends JPanel{
     
 
     public void runGameLoop(JScrollPane scrollPane) {
-
-        JViewport viewport = scrollPane.getViewport();
-
-        // Timer timer = new Timer(10,e->{
-        //     updatePlayerMovement();
-        // });
-        // timer.start();
-
-
+        this.scrollPane = scrollPane;
+        vBar = scrollPane.getVerticalScrollBar();
+        hBar = scrollPane.getHorizontalScrollBar();
+        viewport= scrollPane.getViewport();
 
         Thread gameLoop = new Thread(() -> {
             
@@ -72,55 +71,67 @@ public class GamePanel extends JPanel{
                     lastTime = System.nanoTime();
                     System.out.println("FPS: " + fps);
                     fps = 0;
-
                 }
 
-                repaint();
-                updateViewPort(viewport);
+                viewport = scrollPane.getViewport();
+                
+                repaint(viewport.getViewPosition().x,viewport.getViewPosition().y,viewport.getWidth(),viewport.getHeight());
+                updateViewPort();
                 updatePlayerMovement();
-                //fps counter
                 fps++;
+
                 try {
-                    Thread.sleep(5);
+                    Thread.sleep(10);
                 } catch (InterruptedException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-                // System.out.println("running");
             }
         });
         gameLoop.start();
     }
 
-
-
     private void updatePlayerMovement() {
 
         int movment = 5;
         int translatiox=0,translatey=0;
-        ismovable=false;
+        boolean inframex = viewport.getViewPosition().getX()+viewport.getWidth()/2-16 < player.position.getX() && viewport.getViewPosition().getX()+viewport.getWidth()/2+16 > player.position.getX();
+        boolean inframey = viewport.getViewPosition().getY()+viewport.getHeight()/2-16 < player.position.getY() && viewport.getViewPosition().getY()+viewport.getHeight()/2+16 > player.position.getY(); 
             
-            if(w.keysPressed.contains(KeyEvent.VK_A) && player.position.getX() > boundrec.getX()){
+        
+        
+            if(w.keysPressed.contains(KeyEvent.VK_A) && playerleft ){
                 player.position.translate(-movment, 0);
                 translatiox -= movment;
-                ismovable = true;
+                if(canScrollLeft && inframex){
+                    hBar.setValue(hBar.getValue() - movment);
+                }
+                
             }
-            if(w.keysPressed.contains(KeyEvent.VK_D) && player.position.getX() < this.getWidth()){
+            if(w.keysPressed.contains(KeyEvent.VK_D) && playerright){
                 player.position.translate(movment, 0);
                 translatiox += movment;  
-                ismovable = true;
+                if(canScrollRight && inframex ){
+                    hBar.setValue(hBar.getValue() + movment);
+                }
             }
-            if(w.keysPressed.contains(KeyEvent.VK_W) && player.position.getY() > boundrec.getY()){
+            if(w.keysPressed.contains(KeyEvent.VK_W) && playerup){
                 player.position.translate(0, -movment);
                 translatey -= movment;
-                ismovable = true;
+               if(canScrollUp && inframey){
+                    vBar.setValue(vBar.getValue() - movment);
+                }
             }
-            if(w.keysPressed.contains(KeyEvent.VK_S) && player.position.getY() < boundrec.getHeight()){
+            if(w.keysPressed.contains(KeyEvent.VK_S) && playerdown){
                 player.position.translate(0, movment);
+
                 translatey += movment;
-                ismovable = true;
+                if(canScrollDown && inframey){
+                    vBar.setValue(vBar.getValue() + movment);
+                }
             }
-        player.updatBodyRectangle(translatiox, translatey);
+            player.updatBodyRectangle(translatiox, translatey);
+        
     }
 
 
@@ -129,8 +140,7 @@ public class GamePanel extends JPanel{
     protected void paintComponent(Graphics g) {
 
         super.paintComponent(g);
-        // g2d.drawString("Game Panel", 50, 50);
-        
+    
         renderTiles(g);
         rednerPlayers(g);
 
@@ -139,6 +149,7 @@ public class GamePanel extends JPanel{
     void renderTiles(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         int count = 1;
+
         for (tile tile : tiles) {
             g2d.setColor(Color.black);
             g2d.drawString(""+count, tile.xcoord, tile.ycoord);
@@ -152,8 +163,6 @@ public class GamePanel extends JPanel{
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(Color.RED);
-        
-        
         g2d.draw(player.bodyRectangle);
         
     }
@@ -162,12 +171,23 @@ public class GamePanel extends JPanel{
         return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
     }
 
-    public void updateViewPort(JViewport viewport) {
-            if(boundrec.contains(player.bodyRectangle) || ismovable) {
-                viewport.setViewPosition(new Point((int)player.position.getX()-352, (int)player.position.getY()-288));
-            }    
     
-        }
+    boolean playerleft, playerright,playerup,playerdown;
+    public void updateViewPort() {
+
+     canScrollRight = hBar.getValue() < hBar.getMaximum() - hBar.getVisibleAmount();
+     canScrollLeft = hBar.getValue() > hBar.getMinimum();
+
+     canScrollDown = vBar.getValue() < vBar.getMaximum() - vBar.getVisibleAmount();
+     canScrollUp = vBar.getValue() > vBar.getMinimum();
+
+
+        playerleft = player.position.getX()-16 > 0;
+        playerright = player.position.getX()+16 <this.getWidth();
+        playerup  = player.position.getY() -16 > 0;
+        playerdown = player.position.getY() + 16 <this.getHeight(); 
+
+    }
 
     
     

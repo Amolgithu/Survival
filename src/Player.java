@@ -20,6 +20,7 @@ public class Player {
     }
     public void updatBodyRectangle(int translatiox, int translatey) {
         this.bodyRectangle.translate(translatiox, translatey);
+        // System.out.println("Player body rectangle updated to: " + bodyRectangle);
     }
     public String getName() {
         return name;

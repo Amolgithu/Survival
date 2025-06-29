@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
@@ -8,18 +9,16 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.Timer;
 
 public class window extends JFrame {
 
     public Set<Integer> keysPressed = new HashSet<>();
-    public int tilescount = 64;
+    public int tilescount = 21;
 
     public window() {
         setTitle("Game Window");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setGameArea(tilescount);
-        setSize(800, 600);
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -30,7 +29,7 @@ public class window extends JFrame {
         JScrollPane scrollPane = new JScrollPane(gamePanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-
+        scrollPane.setPreferredSize(new Dimension(704, 576));
 
         gamePanel.runGameLoop(scrollPane);
 
@@ -57,7 +56,7 @@ public class window extends JFrame {
        
 
         add(scrollPane, BorderLayout.CENTER);
-       
+       pack();
 
 
     }
