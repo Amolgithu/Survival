@@ -2,30 +2,25 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Ellipse2D;
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
-import javax.swing.Timer;
 
 public class GamePanel extends JPanel{
 
     private ArrayList<tile> tiles = new ArrayList<tile>();
     private Random random = new Random();
     private Player player;
-    private boolean ismovable = true;
     private window w;
-    private Rectangle boundrec;
+    private static final double FREQUENCY = 0.1; // Tuned for a grid
+    private static final int OCTAVES = 3;
+    private static final double PERSISTENCE = 0.5;
 
     JViewport viewport;
     JScrollPane scrollPane;
@@ -36,12 +31,26 @@ public class GamePanel extends JPanel{
     public GamePanel(int tilescount,window w) {  
         setPreferredSize(new Dimension(64*tilescount, 64*tilescount ));
 
-        boundrec = new Rectangle(352, 288, 64*tilescount-352, 64*tilescount-288);
+        new Rectangle(352, 288, 64*tilescount-352, 64*tilescount-288);
 
         for(int i = 0; i < tilescount; i++) {
             for(int j = 0; j < tilescount; j++) {
-                tile t = new tile(i, j);
-                tiles.add(t);
+
+                double finalNoiseValue = 0;
+                    double currentFrequency = FREQUENCY;
+                    double currentAmplitude = 1;
+
+                    for (int ii = 0; ii < OCTAVES; ii++) {
+                        finalNoiseValue += PerlinNoise.noise(i * currentFrequency, j * currentFrequency, 0) * currentAmplitude;
+                        currentFrequency *= 2;
+                        currentAmplitude *= PERSISTENCE;
+                    }
+                    
+                    finalNoiseValue = Math.max(0, Math.min(1, finalNoiseValue));
+
+                    tile t = new tile(i, j);
+                    t.setTileColor(Tileproperty.tileType(finalNoiseValue));
+                    tiles.add(t);
             }
         }
         player=new Player("Steve");
@@ -151,9 +160,9 @@ public class GamePanel extends JPanel{
         int count = 1;
 
         for (tile tile : tiles) {
-            g2d.setColor(Color.black);
-            g2d.drawString(""+count, tile.xcoord, tile.ycoord);
-            g2d.setColor(Color.GREEN);
+            // g2d.setColor(Color.black);
+            // g2d.drawString(""+count, tile.xcoord, tile.ycoord);
+            g2d.setColor(tile.tileColor);
             g2d.fill(tile.getRect());
             count++;
         }

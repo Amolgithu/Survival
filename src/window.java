@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import javax.swing.JFrame;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -13,7 +12,7 @@ import javax.swing.JScrollPane;
 public class window extends JFrame {
 
     public Set<Integer> keysPressed = new HashSet<>();
-    public int tilescount = 21;
+    public int tilescount = 51;
 
     public window() {
         setTitle("Game Window");

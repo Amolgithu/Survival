@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "window",
+            "request": "launch",
+            "mainClass": "window",
+            "projectName": "Survival_78ff72d2"
+        },
+        {
+            "type": "java",
             "name": "Attach",
             "request": "attach",
             "hostName": "localhost",
